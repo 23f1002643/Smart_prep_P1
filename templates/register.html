@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+{% block content %}
+    <section class="min-vh-100 d-flex align-items-center justify-content-center gradient-custom">
+        <div class="container py-3">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-4 text-center">
+                            <h2 class="fw-bold text-uppercase">Register</h2>
+                            <p class="text-white-50">Please enter your details!</p>
+                            <form method="POST" action="{{ url_for('register') }}" autocomplete="off">
+                                <div class="form-outline form-white mb-3">
+                                    <input type="text" id="first_name" name="first_name" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="first_name">First Name</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="text" id="last_name" name="last_name" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="last_name">Last Name</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="text" id="username" name="username" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="username">Username</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="password" id="password" name="password" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="password">Password</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="text" id="mobile_no" name="mobile_no" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="mobile_no">Mobile Number</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="email" id="email" name="email" class="form-control form-control-lg" required autocomplete="off" />
+                                    <label class="form-label" for="email">Email</label>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <label class="form-label" for="qualification">Qualification</label>
+                                    <select id="qualification" name="qualification" class="form-select form-control-lg" required autocomplete="off">
+                                        <option value="" disabled selected>Qualification</option>
+                                        <option value="Primer">Primer</option>
+                                        <option value="10th">10th</option>
+                                        <option value="12th">12th</option>
+                                        <option value="Graduate">Graduate</option>
+                                        <option value="Post Graduate">Post Graduate</option>
+                                    </select>
+                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <label class="form-label" for="dob">Date of Birth</label>
+                                    <input type="date" id="dob" name="dob" class="form-control form-control-lg" required autocomplete="off" />
+                                </div>
+                                <button type="submit" class="btn btn-outline-light btn-lg px-5 gradient-custom">Register</button>
+                            </form>
+                            <p class="mt-4 mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-white-50 fw-bold">Login</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+

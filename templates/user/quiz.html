@@ -1,0 +1,36 @@
+<!-- templates/user/quiz.html -->
+{% extends "base.html" %}
+{% block title %}Take Quiz{% endblock %}
+{% block content %}
+<div class="quiz-container">
+    <h2>{{ quiz.chapter.subject.name }} - {{ quiz.chapter.name }}</h2>
+    <p>Duration: {{ quiz.time_duration }}</p>
+    
+    <form method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}" class="quiz-form">
+        {% for question in quiz.questions %}
+        <div class="question-card">
+            <p class="question">{{ loop.index }}. {{ question.question_statement }}</p>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="q{{ question.id }}_1" name="question_{{ question.id }}" value="1" required>
+                    <label for="q{{ question.id }}_1">{{ question.option1 }}</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q{{ question.id }}_2" name="question_{{ question.id }}" value="2">
+                    <label for="q{{ question.id }}_2">{{ question.option2 }}</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q{{ question.id }}_3" name="question_{{ question.id }}" value="3">
+                    <label for="q{{ question.id }}_3">{{ question.option3 }}</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q{{ question.id }}_4" name="question_{{ question.id }}" value="4">
+                    <label for="q{{ question.id }}_4">{{ question.option4 }}</label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit Quiz</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!-- templates/admin/subjects.html -->
+{% extends "base.html" %}
+{% block title %}Manage Subjects{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2>Manage Subjects</h2>
+    <form method="POST" class="form">
+        <div class="form-group">
+            <label for="name">Subject Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Subject</button>
+    </form>
+
+    <div class="subjects-list">
+        <h3>Current Subjects</h3>
+        {% for subject in subjects %}
+        <div class="subject-card">
+            <h4>{{ subject.name }}</h4>
+            <p>{{ subject.description }}</p>
+            <div class="button-group">
+                <a href="#" class="btn btn-secondary">Edit</a>
+                <a href="#" class="btn btn-danger">Delete</a>
+                <a href="#" class="btn btn-primary">Manage Chapters</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
