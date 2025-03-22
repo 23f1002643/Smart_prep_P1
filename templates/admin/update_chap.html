@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Update Chapter{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Update Chapter</h2>
+    <form method="POST" action="{{ url_for('update_chap',sub_id=sub_id, chap_id=chapter.id) }}" class="form">
+        <div class="form-group">
+            <label id="white" for="name">Chapter Name:</label>
+            <input type="text" id="name" name="name" value="{{ chapter.name }}" required>
+        </div>
+        <div class="form-group">
+            <label id="white" for="description">Description:</label>
+            <textarea id="description" name="description" rows="3">{{ chapter.description }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Chapter</button>
+    </form>
+</div>
+{% endblock %}

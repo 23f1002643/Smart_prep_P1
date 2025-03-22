@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Manage Chapters{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Chapters</h2>
+    <form method="POST" class="form">
+        <div class="form-group">
+            <label id="white" for="name">Chapter Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label id="white" for="description">Description:</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Chapter</button>
+    </form>
+
+    <div class="chapters-list">
+        <h3 id="white">Current Chapters</h3>
+        {% for chapter in chapters if chapter.subject_id == sub_id %}
+        <div class="subject-card">
+            <h4 >{{ chapter.name }}</h4>
+            <p >{{ chapter.description }}</p>
+            <div class="button-group">
+                <a href="{{ url_for('update_chap', sub_id=chapter.subject_id, chap_id=chapter.id) }}" class="btn btn-secondary">Edit</a>
+                <form action="{{ url_for('delete_chapter', sub_id=chapter.subject_id, chap_id=chapter.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <a href="#" class="btn btn-primary">Manage Content</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

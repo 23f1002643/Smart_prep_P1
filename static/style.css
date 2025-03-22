@@ -244,4 +244,6 @@ body {
     margin-bottom: 20px;
     border-radius: 5px;
   }  
-  
+  #white {
+    color: rgb(235, 228, 228);
+  }

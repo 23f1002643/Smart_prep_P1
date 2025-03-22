@@ -3,29 +3,31 @@
 {% block title %}Manage Subjects{% endblock %}
 {% block content %}
 <div class="content-section">
-    <h2>Manage Subjects</h2>
+    <h2 id="white">Manage Subjects</h2>
     <form method="POST" class="form">
         <div class="form-group">
-            <label for="name">Subject Name:</label>
+            <label id="white" for="name">Subject Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
         <div class="form-group">
-            <label for="description">Description:</label>
+            <label id="white" for="description">Remarks:</label>
             <textarea id="description" name="description" rows="3"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Add Subject</button>
     </form>
 
     <div class="subjects-list">
-        <h3>Current Subjects</h3>
+        <h3 id="white">Current Subjects</h3>
         {% for subject in subjects %}
         <div class="subject-card">
-            <h4>{{ subject.name }}</h4>
-            <p>{{ subject.description }}</p>
+            <h4>{{ subject.s_name }}</h4>
+            <p>{{ subject.remarks }}</p>
             <div class="button-group">
-                <a href="#" class="btn btn-secondary">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
-                <a href="#" class="btn btn-primary">Manage Chapters</a>
+                <a href="{{ url_for('update_sub', sub_id=subject.id) }}" class="btn btn-secondary">Edit</a>
+                <form action="{{ url_for('delete_subject', sub_id=subject.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage Chapters</a>
             </div>
         </div>
         {% endfor %}

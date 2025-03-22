@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from models import db, Account, Courses, Assessment
-from datetime import datetime
+from models import db, Account, Courses, Assessment, CourseModule, AssessmentProblem, ExamPerformance 
+from datetime import datetime, timedelta
 import config
 
 # Flask app setup
 app = Flask(__name__)
-app.config.from_object(config)
+app.config['SECRET_KEY'] = config.config_settings['SECRET_KEY']
+app.config['SQLALCHEMY_DATABASE_URI'] = config.config_settings['SQLALCHEMY_DATABASE_URI']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config_settings['SQLALCHEMY_TRACK_MODIFICATIONS']
+app.config['PERMANENT_SESSION_LIFETIME'] = config.config_settings['PERMANENT_SESSION_LIFETIME']
 db.init_app(app)
 print("Database initialized.")
-# Checking if admin exist in the database or not
+
 def check_admin():
     with app.app_context():
         admin = Account.query.filter_by(username='admin').first()
@@ -26,28 +29,6 @@ def check_admin():
             db.session.add(admin)
             db.session.commit()
             print("Admin account created.")
-
-# Routes
-
-# @app.route('/login', methods=['GET', 'POST'])
-# @app.route('/')
-# def login():
-#     if request.method == 'POST':
-#         username = request.form.get('username')
-#         password = request.form.get('password')
-#         print('username:', username)
-#         print('password:', password)
-
-#         user = Account.query.filter_by(username=username).first()
-#         if user and user.pwd == password:
-#             session['user_id'] = user.id
-#             session['role'] = user.role
-#             session.permanent = True
-#             flash('Logged in successfully!', 'success')
-#             return redirect(url_for('dashboard'))
-
-#         flash('Invalid username or password', 'error')
-#     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -80,11 +61,10 @@ def register():
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
-# @app.route('/')
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')  # Get username from form
-        password = request.form.get('password')  # Get password from form
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         user = Account.query.filter_by(username=username).first()  
         if user and user.pwd == password:
@@ -97,7 +77,6 @@ def login():
         flash('Invalid username or password', 'danger')
 
     return render_template('login.html')
-
 
 @app.route('/logout')
 def logout():
@@ -125,18 +104,92 @@ def manage_subjects():
         name = request.form.get('name')
         description = request.form.get('description')
 
-        new_subject = Courses(name=name, description=description)
-        db.session.add(new_subject)
+        new_sub = Courses(s_name=name, remarks=description)
+        db.session.add(new_sub)
         db.session.commit()
         flash('Subject added successfully!', 'success')
+        return redirect(url_for('manage_subjects'))
 
     subjects = Courses.query.all()
+    print(subjects)
     return render_template('admin/subjects.html', subjects=subjects)
 
-# Runing the app
+@app.route('/admin/subjects/delete/<int:sub_id>', methods=['GET','POST'])
+def delete_subject(sub_id):
+    """Admin panel - remove an existing subject"""
+    if request.method != 'POST':
+        flash('Invalid request!', 'danger')
+        return redirect(url_for('manage_subjects'))
+
+    subject = Courses.query.get(sub_id)
+    print(subject)
+    if subject is not None:
+        db.session.delete(subject)
+        db.session.commit()
+        flash('Subject successfully removed!', 'success')
+    else:
+        flash('Subject not found!', 'danger')
+
+    return redirect(url_for('manage_subjects'))
+
+@app.route('/admin/subjects/<int:sub_id>/chapters', methods=['GET', 'POST'])
+def add_chapter(sub_id):
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+
+        new_chapter = CourseModule(name=name, description=description, subject_id=sub_id)
+        db.session.add(new_chapter)
+        db.session.commit()
+        flash('Chapter added successfully!', 'success')
+        return redirect(url_for('add_chapter', sub_id=sub_id))
+
+    chapters = CourseModule.query.all()
+    return render_template('admin/chapters.html', chapters=chapters, sub_id=sub_id)
+
+@app.route('/admin/subjects/<int:sub_id>/chapters/delete/<int:chap_id>', methods=['GET','POST'])
+def delete_chapter(sub_id, chap_id):
+    if request.method != 'POST':
+        flash('Invalid request!', 'danger')
+        return redirect(url_for('add_chapter', sub_id=sub_id)) 
+
+    chapter = CourseModule.query.get(chap_id)
+    if chapter is not None:
+        db.session.delete(chapter)
+        db.session.commit()
+        flash('Chapter successfully removed!', 'success')
+        return redirect(url_for('add_chapter', sub_id=sub_id))
+
+    return redirect(url_for('add_chapter', sub_id=sub_id))
+
+@app.route('/admin/subjects/update/<int:sub_id>', methods=['GET', 'POST'])
+def update_sub(sub_id):
+    subject = Courses.query.get(sub_id)
+    print(subject)
+    print(sub_id)
+    if request.method != 'POST':
+        return render_template('admin/update_sub.html', subject=subject)
+    subject.s_name = request.form.get('name')
+    subject.remarks = request.form.get('description')
+    db.session.commit()
+    flash('Subject updated successfully!', 'success')
+    return redirect(url_for('manage_subjects'))
+
+@app.route('/admin/subjects/<int:sub_id>/chapters/update/<int:chap_id>', methods=['GET', 'POST'])
+def update_chap(sub_id, chap_id):
+    chapter = CourseModule.query.get(chap_id)
+    if request.method != 'POST':
+        return render_template('admin/update_chap.html', chapter=chapter, sub_id=sub_id)
+    chapter.name = request.form.get('name')
+    chapter.description = request.form.get('description')
+    db.session.commit()
+    flash('Chapter updated successfully!', 'success')
+    return redirect(url_for('add_chapter', sub_id=sub_id))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         check_admin()
-        print("Setup Complete!")
+        print("Admin Already Exists")
     app.run(debug=True)
+
