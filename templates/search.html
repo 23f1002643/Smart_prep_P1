@@ -3,69 +3,167 @@
 {% block content %}
 <div class="content-section">
     <h2 id="white">Search Results</h2>
+    <h4 id="white">You searched for: "{{ search_query }}"</h4>
+    
     {% if user_role == 'admin' %}
-        <h4 id="white">You searched for: {{ search_query }}</h4>
+        <h3 id="white">Users</h3>
+        {% if users %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.f_name }}</td>
+                        <td>{{ user.l_name }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ "Active" if user.active else "Deactivated" }}</td>
+                        <td>
+                            <form action="{{ url_for('manage_user', user_id=user.id) }}" method="POST">
+                                <button type="submit" class="btn btn-{{ 'danger' if user.active else 'success' }}">
+                                    {{ "Deactivate" if user.active else "Activate" }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p id="white">No users found.</p>
+        {% endif %}
+    {% endif %}
+
+    <h3 id="white">Subjects</h3>
+    {% if subjects %}
         <table class="table">
             <thead>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>Subject Name</th>
+                    {% if user_role == 'admin' %}<th class="text-right">Actions</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for subject in subjects %}
                 <tr>
-                    <td>{{ user.f_name }}</td>
-                    <td>{{ user.l_name }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.role }}</td>
-                    <td>{{ "Active" if user.active else "Deactive" }}</td>
-                    <td>
-                        <form action="{{ url_for('manage_user', user_id=user.id) }}" method="POST">
-                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                            <button type="submit" class="btn btn-{{ 'success' if not user.active else 'danger' }} text-white">
-                                {{ "Activate" if not user.active else "Deactivate" }}
-                            </button>
+                    <td>{{ subject.s_name }}</td>
+                    {% if user_role == 'admin' %}
+                    <td class="text-right">
+                        <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p id="white">No subjects found.</p>
+    {% endif %}
+
+    <h3 id="white">Chapters</h3>
+    {% if chapters %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Chapter Name</th>
+                    {% if user_role == 'admin' %}<th class="text-right">Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for chapter in chapters %}
+                <tr>
+                    <td>{{ chapter.name }}</td>
+                    {% if user_role == 'admin' %}
+                    <td class="text-right">
+                        <a href="{{ url_for('update_chap', sub_id=chapter.subject_id, chap_id=chapter.id) }}" class="btn btn-primary">Update</a>
+                        <form action="{{ url_for('delete_chapter', sub_id=chapter.subject_id, chap_id=chapter.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p id="white">No chapters found.</p>
+    {% endif %}
+
+    <h3 id="white">Quizzes</h3>
+    {% if quizzes %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Quiz Name</th>
+                    <th>Duration</th>
+                    <th>Date</th>
+                    <th>No. of Questions</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizzes %}
+                <tr>
+                    <td>{{ quiz.q_name }}</td>
+                    <td>{{ quiz.time_duration }}</td>
+                    <td>{{ quiz.date_of_quiz }}</td>
+                    <td>{{ quiz.questions|length }}</td>
+                    <td class="text-right">
+                        {% if user_role == 'user' %}
+                            <a href="{{ url_for('start_Assessment', quiz_id=quiz.id, sub_id=quiz.chapter.subject_id, chap_id=quiz.chapter_id) }}" class="btn btn-primary">Start</a>
+                        {% elif user_role == 'admin' %}
+                            <a href="{{ url_for('update_quiz', quiz_id=quiz.id, sub_id=quiz.chapter.subject_id, chap_id=quiz.chapter_id) }}" class="btn btn-primary">Update</a>
+                            <form action="{{ url_for('remove_quiz', quiz_id=quiz.id, sub_id=quiz.chapter.subject_id, chap_id=quiz.chapter_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <h4 id="white">You searched for: {{ search_query }}</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th>Chapter</th>
-                    <th>Quiz Name</th>
-                    <th>Duration</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for quiz in quizzes %}
-                <tr>
-                    <td>{{ quiz.chapter.subject.s_name }}</td>
-                    <td>{{ quiz.chapter.name }}</td>
-                    <td>{{ quiz.q_name }}</td>
-                    <td>{{ quiz.time_duration }}</td>
-                    <td>{{ quiz.date_of_quiz }}</td>
-                    <td>
-                        <a href="{{ url_for('start_Assessment', quiz_id=quiz.id) }}" class="btn btn-primary">Start</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <p id="white">No quizzes found.</p>
+    {% endif %}
+
+    {% if user_role == 'admin' %}
+        <h3 id="white">Questions</h3>
+        {% if questions %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                    <tr>
+                        <td>{{ question.statement }}</td>
+                        <td class="text-right">
+                            <a href="{{ url_for('update_quest', ques_id=question.id, sub_id=question.quiz.chapter.subject_id, chap_id=question.quiz.chapter_id, quiz_id=question.quiz_id) }}" class="btn btn-primary">Update</a>
+                            <form action="{{ url_for('remove_quest', ques_id=question.id, sub_id=question.quiz.chapter.subject_id, chap_id=question.quiz.chapter_id, quiz_id=question.quiz_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p id="white">No questions found.</p>
+        {% endif %}
     {% endif %}
 </div>
 {% endblock %}

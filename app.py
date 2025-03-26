@@ -110,7 +110,6 @@ def dashboard():
 
 @app.route('/admin/subjects', methods=['GET', 'POST'])
 def manage_subjects():
-    """Admin page - No restriction now!"""
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
@@ -297,7 +296,6 @@ def quiz_info(quiz_id):
     quiz = Assessment.query.get(quiz_id)
     questions = AssessmentProblem.query.filter_by(quiz_id=quiz_id).all()
     return render_template('user/view_quiz.html', quiz=quiz, questions=questions)
-
 @app.route('/user/quiz/start/<int:quiz_id>', methods=['GET', 'POST'])
 def start_Assessment(quiz_id):
     if 'user_id' not in session:
@@ -320,14 +318,9 @@ def start_Assessment(quiz_id):
         if str(question.id) in ans and int(ans[str(question.id)]) == question.cor_opt
     )
     print("Total Marks:", Total_Marks)
-    # Check if a score already exists for this user & quiz
-    exi_score = ExamPerformance.query.filter_by(user_id=session['user_id'], quiz_id=quiz_id).first()
-    if exi_score:
-        exi_score.score = Total_Marks  # Update the score
-    else:
-        latest_score = ExamPerformance(score=Total_Marks, user_id=session['user_id'], quiz_id=quiz_id)
-        db.session.add(latest_score)
-
+    
+    latest_score = ExamPerformance(score=Total_Marks, user_id=session['user_id'], quiz_id=quiz_id)
+    db.session.add(latest_score)
     db.session.commit()
 
     flash('Quiz submitted successfully!', 'success')
@@ -343,10 +336,10 @@ def manage_user(user_id):
         print("User_id:", user_id)  # Debugging
 
         if user_id is None:
-            flash("Invalid user ID!", "danger")
+            # flash("Invalid user ID!", "danger")
             return render_template('admin/manage_user.html', users=users)
 
-        user = Account.query.get(int(user_id))  # Convert user_id to integer
+        user = Account.query.get(user_id)  
 
         if user:
             user.active = not user.active 
@@ -359,21 +352,52 @@ def manage_user(user_id):
 
     return render_template('admin/manage_user.html', users=users)
 
-# write code to search, you can take help of search.html 
 @app.route('/search', methods=['GET', 'POST'])
-def search(): 
-    if 'user_id' not in session or session['role']!= 'admin':
+def search():
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+
+    user_role = session.get('role')  # Get the role of the logged-in user
+
     if request.method == 'POST':
-        search = request.form.get('search')
-        if search:
-            user = Account.query.filter(Account.username.like(f'%{search}%')).all()
-            sub = Courses.query.filter(Courses.s_name.like(f'%{search}%')).all()
-            quiz = Assessment.query.filter(Assessment.q_name.like(f'%{search}%')).all()
-            return render_template('search.html', users=user, subjects=sub, quizzes=quiz)
+        search_query = request.form.get('search')
+
+        if not search_query:
+            flash(f'Search "{search_query}" not found!', 'danger')
+            return redirect(url_for('search'))  # Redirect if empty search
+
+        # Admin can search everything
+        if user_role == 'admin':
+            users = Account.query.filter(Account.username.ilike(f'%{search_query}%')).all()
+            subjects = Courses.query.filter(Courses.s_name.ilike(f'%{search_query}%')).all()
+            quizzes = Assessment.query.filter(Assessment.q_name.ilike(f'%{search_query}%')).all()
+            chapters = CourseModule.query.filter(CourseModule.name.ilike(f'%{search_query}%')).all()
+            questions = AssessmentProblem.query.filter(AssessmentProblem.statement.ilike(f'%{search_query}%')).all()
         else:
-            flash('Please enter a search term!', 'danger')
-    return render_template('search.html')
+            # Normal user should only see quizzes and subjects
+            users = []
+            subjects = Courses.query.filter(Courses.s_name.ilike(f'%{search_query}%')).all()
+            quizzes = Assessment.query.filter(Assessment.q_name.ilike(f'%{search_query}%')).all()
+            chapters = []
+            questions = []
+
+        return render_template('search.html',
+                                users=users,
+                                subjects=subjects,
+                                quizzes=quizzes,
+                                chapters=chapters,
+                                questions=questions,
+                                user_role=user_role,
+                                search_query=search_query)
+
+    return render_template('search.html', user_role=user_role)
+
+@app.route('/user/scores_history')
+def scores_history():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    scores = ExamPerformance.query.filter_by(user_id=session['user_id']).order_by(ExamPerformance.time_of_attempt.desc()).all()
+    return render_template('user/scores_history.html', scores=scores)
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Score History{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Score History</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Chapter</th>
+                <th>Quiz Name</th>
+                <th>Score</th>
+                <th>Date of Attempt</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for score in scores %}
+            <tr>
+                <td>{{ score.quiz.chapter.course.s_name }}</td>
+                <td>{{ score.quiz.chapter.name }}</td>
+                <td>{{ score.quiz.q_name }}</td>
+                <td>{{ score.score }}</td>
+                <td>{{ score.time_of_attempt }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-danger">Go to Dashboard</a>
+</div>
+{% endblock %}
+

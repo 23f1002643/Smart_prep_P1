@@ -17,7 +17,7 @@
 </head>
 <body class="gradient-custom">
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-        <a class="navbar-brand fw-bold" href="#">Smart Prep</a>
+        <a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}">Smart Prep</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 {% if session.get('user_id') %}
@@ -30,7 +30,7 @@
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_subjects') }}">Manage Subjects</a></li>
                     {% endif %}
                     {% if session.get('role') != 'admin' %}
-                        <li class="nav-item"><a class="nav-link" href="#">Scores</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('scores_history') }}">Scores</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
