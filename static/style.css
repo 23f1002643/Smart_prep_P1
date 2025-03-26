@@ -187,12 +187,16 @@ body {
   gap: 0.5rem;
 }
 
-.option {
+/* .option {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+} */
+.option {
+  display: flex;
+  align-items: center; /* Align radio and label */
+  gap: 5px; /* space between radio and label */
 }
-
 @media (max-width: 768px) {
   .nav-links {
     display: flex;

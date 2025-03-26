@@ -1,20 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Quiz Details{% endblock %}
+{% block title %}Available Quizzes{% endblock %}
 {% block content %}
 <div class="content-section">
-    <h2 id="white">Quiz Details</h2>
-    <div class="quiz-card d-flex flex-column  p-3 border" style="height: 350px;">
-        <div>
-            <h4>Subject : {{ quiz.chapter.course.s_name }}</h4><br>
-            <h6>Chapter : {{ quiz.chapter.name }}</h6><br>
-            <p>Quiz Name : {{ quiz.q_name }}</p>
-            <p>No. of Questions : {{ quiz.questions|length }}</p>
-            <p>Duration : {{ quiz.time_duration }}</p>
-            <p>Date : {{ quiz.date_of_quiz }}</p>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <a href="{{ url_for('start_Assessment', quiz_id=quiz.id) }}" class="btn btn-primary" style="width: 150px;">Start</a>
+    <h2 id="white">Available Quizzes in {{ chapter.name }}</h2>
+    <div class="container">
+        <div class="row">
+            {% for quiz in quizzes %}
+            <div class="col-md-4">
+                <div class="quiz-card d-flex flex-column" style="height: 250px;">
+                    <div>
+                        <!-- <h4>Subject: {{ quiz.chapter.course.s_name }}</h4> -->
+                        <h6>Quiz Name: {{ quiz.q_name }}</h6>
+                        <p>Date: {{ quiz.date_of_quiz }}</p>
+                        <p>Duration: {{ quiz.time_duration }}</p>
+                        <p>No. of Questions: {{ quiz.questions|length }}</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: auto;">
+                        <a href="{{ url_for('quiz_info', quiz_id=quiz.id) }}" class="btn btn-primary" style="width: 150px;">View</a>
+                        <a href="{{ url_for('start_Assessment', quiz_id=quiz.id) }}" class="btn btn-danger" style="width: 150px;">Start</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 {% endblock %}
+

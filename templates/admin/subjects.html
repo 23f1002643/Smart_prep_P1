@@ -21,7 +21,7 @@
 
         {% for subject in subjects %}
         <div class="subject-card d-flex justify-content-between align-items-center">
-            <h4>{{ subject.s_name }}</h4>
+            <h4 style="margin-left: 30px;">{{ subject.s_name }}</h4>
             <p>{{ subject.remarks }}</p>
             <div class="button-group">
                 <a href="{{ url_for('update_sub', sub_id=subject.id) }}" class="btn btn-secondary">Edit</a>

@@ -51,18 +51,20 @@
             <thead>
                 <tr>
                     <th>Subject Name</th>
-                    {% if user_role == 'admin' %}<th class="text-right">Actions</th>{% endif %}
+                    <th class="text-right">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for subject in subjects %}
                 <tr>
                     <td>{{ subject.s_name }}</td>
-                    {% if user_role == 'admin' %}
                     <td class="text-right">
-                        <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage</a>
+                        {% if user_role == 'admin' %}
+                            <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage</a>
+                        {% elif user_role == 'user' %}
+                            <a href="{{ url_for('subjects', sub_id=subject.id) }}" class="btn btn-primary">View Details</a>
+                        {% endif %}
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -77,21 +79,23 @@
             <thead>
                 <tr>
                     <th>Chapter Name</th>
-                    {% if user_role == 'admin' %}<th class="text-right">Actions</th>{% endif %}
+                    <th class="text-right">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for chapter in chapters %}
                 <tr>
                     <td>{{ chapter.name }}</td>
-                    {% if user_role == 'admin' %}
                     <td class="text-right">
-                        <a href="{{ url_for('update_chap', sub_id=chapter.subject_id, chap_id=chapter.id) }}" class="btn btn-primary">Update</a>
-                        <form action="{{ url_for('delete_chapter', sub_id=chapter.subject_id, chap_id=chapter.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
+                        {% if user_role == 'admin' %}
+                            <a href="{{ url_for('update_chap', sub_id=chapter.subject_id, chap_id=chapter.id) }}" class="btn btn-primary">Update</a>
+                            <form action="{{ url_for('delete_chapter', sub_id=chapter.subject_id, chap_id=chapter.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        {% else %}
+                            <a href="{{ url_for('available_quiz', chap_id=chapter.id) }}" class="btn btn-primary">View Details</a>
+                        {% endif %}
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,6 +109,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Chapter Name</th>
                     <th>Quiz Name</th>
                     <th>Duration</th>
                     <th>Date</th>
@@ -115,6 +120,7 @@
             <tbody>
                 {% for quiz in quizzes %}
                 <tr>
+                    <td>{{ quiz.chapter.name }}</td>
                     <td>{{ quiz.q_name }}</td>
                     <td>{{ quiz.time_duration }}</td>
                     <td>{{ quiz.date_of_quiz }}</td>

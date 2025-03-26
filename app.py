@@ -106,7 +106,10 @@ def dashboard():
         return render_template('admin/dashboard.html')
     
     quizzes = Assessment.query.all()
-    return render_template('user/dashboard.html', quizzes=quizzes, first_name=user.f_name)
+    subjects = Courses.query.all()
+    today = datetime.today().date()
+    print(today)
+    return render_template('user/dashboard.html', first_name=user.f_name, subjects=subjects, quizzes=quizzes, today=today)
 
 @app.route('/admin/subjects', methods=['GET', 'POST'])
 def manage_subjects():
@@ -295,7 +298,10 @@ def update_quest(sub_id, chap_id, quiz_id, ques_id):
 def quiz_info(quiz_id):
     quiz = Assessment.query.get(quiz_id)
     questions = AssessmentProblem.query.filter_by(quiz_id=quiz_id).all()
-    return render_template('user/view_quiz.html', quiz=quiz, questions=questions)
+    return render_template('user/quiz_info.html', quiz=quiz, questions=questions)
+
+
+
 @app.route('/user/quiz/start/<int:quiz_id>', methods=['GET', 'POST'])
 def start_Assessment(quiz_id):
     if 'user_id' not in session:
@@ -378,7 +384,7 @@ def search():
             users = []
             subjects = Courses.query.filter(Courses.s_name.ilike(f'%{search_query}%')).all()
             quizzes = Assessment.query.filter(Assessment.q_name.ilike(f'%{search_query}%')).all()
-            chapters = []
+            chapters = CourseModule.query.filter(CourseModule.name.ilike(f'%{search_query}%')).all()
             questions = []
 
         return render_template('search.html',
@@ -398,6 +404,35 @@ def scores_history():
         return redirect(url_for('login'))
     scores = ExamPerformance.query.filter_by(user_id=session['user_id']).order_by(ExamPerformance.time_of_attempt.desc()).all()
     return render_template('user/scores_history.html', scores=scores)
+
+# make routes for subjects for user 
+@app.route('/user/subjects/<int:sub_id>', methods=['GET', 'POST'])
+def subjects(sub_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))   
+    
+    user = Account.query.get(session['user_id'])
+    subject = Courses.query.get(sub_id)
+    chapters = CourseModule.query.filter_by(subject_id=sub_id).all()
+    return render_template('user/view_chapter.html', user=user, subject=subject, chapters=chapters) 
+
+@app.route('/user/chapter/<int:chap_id>', methods=['GET', 'POST'])
+def available_quiz(chap_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    chapter = CourseModule.query.get(chap_id)
+    if not chapter:
+        flash('Chapter not found!', 'danger')
+        return redirect(url_for('dashboard'))
+
+    quizzes = Assessment.query.filter_by(chapter_id=chap_id).all()
+    return render_template('user/view_quiz.html', quizzes=quizzes, chapter=chapter)
+
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():

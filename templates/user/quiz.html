@@ -22,26 +22,27 @@
             <p class="question">{{ loop.index }}. {{ question.statement }}</p>
             <div class="options">
                 <div class="option">
-                    <input type="radio" name="{{ question.id }}" value="1" required>
-                    <label>{{ question.opt1 }}</label>
+                    <input type="radio" id="opt1_{{ question.id }}" name="{{ question.id }}" value="1" required>
+                    <label for="opt1_{{ question.id }}">{{ question.opt1 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="{{ question.id }}" value="2">
-                    <label>{{ question.opt2 }}</label>
+                    <input type="radio" id="opt2_{{ question.id }}" name="{{ question.id }}" value="2">
+                    <label for="opt2_{{ question.id }}">{{ question.opt2 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="{{ question.id }}" value="3">
-                    <label>{{ question.opt3 }}</label>
+                    <input type="radio" id="opt3_{{ question.id }}" name="{{ question.id }}" value="3">
+                    <label for="opt3_{{ question.id }}">{{ question.opt3 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" name="{{ question.id }}" value="4">
-                    <label>{{ question.opt4 }}</label>
+                    <input type="radio" id="opt4_{{ question.id }}" name="{{ question.id }}" value="4">
+                    <label for="opt4_{{ question.id }}">{{ question.opt4 }}</label>
                 </div>
-            </div>
+            </div>            
         </div>
         {% endfor %}
         <button type="submit" class="btn btn-primary">Submit Quiz</button>
     </form>
 </div>
 {% endblock %}
+
 

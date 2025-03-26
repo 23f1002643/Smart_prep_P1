@@ -20,7 +20,7 @@
                 <td>{{ score.quiz.chapter.name }}</td>
                 <td>{{ score.quiz.q_name }}</td>
                 <td>{{ score.score }}</td>
-                <td>{{ score.time_of_attempt }}</td>
+                <td>{{ score.time_of_attempt.strftime('%Y-%m-%d %H:%M:%S') }}</td>
             </tr>
             {% endfor %}
         </tbody>

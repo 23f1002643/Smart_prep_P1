@@ -1,0 +1,36 @@
+<!-- templates/user/view_subjects.html -->
+{% extends "base.html" %}
+{% block title %}Subject Details{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <h2 id="white">Chapters in {{ subject.s_name }}</h2>
+    <div class="quiz-section">
+        <h5 id="white">Available Chapters</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Chapter ID</th>
+                    <th>Chapter Name</th>
+                    <th>Subject Name</th>
+                    <th>No. of Quizzes</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for chapter in subject.chapters %}
+                <tr>
+                    <td>{{ chapter.id }}</td>
+                    <td>{{ chapter.name }}</td>
+                    <td>{{ chapter.course.s_name }}</td>
+                    <td>{{ chapter.quizzes|length }}</td>
+                    <td class="text-right">
+                        <a href="{{ url_for('available_quiz', chap_id=chapter.id) }}" class="btn btn-primary">View Quizzes</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
