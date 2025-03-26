@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Update Quiz{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Update Quiz</h2>
+    <form method="POST" action="{{ url_for('update_quiz', sub_id=sub_id, chap_id=chap_id, quiz_id=quiz.id) }}" class="form">
+        <div class="form-group">
+            <label id="white" for="name">Quiz Name:</label>
+            <input type="text" id="name" name="name" value="{{ quiz.q_name }}" required>
+        </div>
+        <div class="form-group">
+            <label id="white" for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ quiz.date_of_quiz.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <div class="form-group">
+            <div style="display: flex; gap: 5px;">
+                <input type="number" id="hours" name="hours" min="0" max="12" value="{{ quiz.time_duration[:2] }}" placeholder="HH" required style="width: 60px;">
+                <h3>:</h3>
+                <input type="number" id="minutes" name="minutes" min="0" max="59" value="{{ quiz.time_duration[3:] }}" placeholder="MM" required style="width: 60px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label id="white" for="remarks">Remarks:</label>
+            <textarea id="remarks" name="remarks" rows="3">{{ quiz.remarks }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Quiz</button>
+    </form>
+</div>
+{% endblock %}
+

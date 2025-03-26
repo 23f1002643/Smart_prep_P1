@@ -10,34 +10,23 @@
                         <div class="card-body p-4 text-center">
                             <h2 class="fw-bold text-uppercase">Register</h2>
                             <p class="text-white-50">Please enter your details!</p>
-                            <form method="POST" action="{{ url_for('register') }}" autocomplete="off">
+                            <form method="POST" action="{{ url_for('register') }}" >
                                 <div class="form-outline form-white mb-3">
-                                    <input type="text" id="first_name" name="first_name" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="first_name">First Name</label>
+                                    <input type="text" id="f_name" name="f_name" placeholder="First Name" required style="width: 380px; height: 40px;" autocomplete="off">                                </div>
+                                <div class="form-outline form-white mb-3">
+                                    <input type="text" id="l_name" name="l_name" required autocomplete="off" style="width: 380px; height: 40px;" placeholder="Last Name" />
                                 </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input type="text" id="last_name" name="last_name" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="last_name">Last Name</label>
-                                </div>
+                                    <input type="text" id="username" name="username" required autocomplete="off" style="width: 380px; height: 40px;" placeholder="Username" />                                </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input type="text" id="username" name="username" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="username">Username</label>
-                                </div>
+                                    <input type="email" id="email" name="email" required autocomplete="off" style="width: 380px; height: 40px;" placeholder="Email" />                                </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input type="password" id="password" name="password" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="password">Password</label>
-                                </div>
+                                    <input type="password" id="pwd" name="pwd" required autocomplete="off" style="width: 380px; height: 40px;" placeholder="Password" />                                </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input type="text" id="mobile_no" name="mobile_no" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="mobile_no">Mobile Number</label>
-                                </div>
+                                    <input type="text" id="mobile_no" name="mobile_no" required autocomplete="off" style="width: 380px; height: 40px;" placeholder="Mobile Number" />                                </div>
                                 <div class="form-outline form-white mb-3">
-                                    <input type="email" id="email" name="email" class="form-control form-control-lg" required autocomplete="off" />
-                                    <label class="form-label" for="email">Email</label>
-                                </div>
-                                <div class="form-outline form-white mb-3">
-                                    <label class="form-label" for="qualification">Qualification</label>
-                                    <select id="qualification" name="qualification" class="form-select form-control-lg" required autocomplete="off">
+                                    <label class="form-label" for="edu_qul">Qualification</label>
+                                    <select id="edu_qul" name="edu_qul" class="form-select form-control-lg" style="width: 380px; height: 40px;" required autocomplete="off">
                                         <option value="" disabled selected>Qualification</option>
                                         <option value="Primer">Primer</option>
                                         <option value="10th">10th</option>

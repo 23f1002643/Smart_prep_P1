@@ -3,29 +3,39 @@
 {% block title %}Take Quiz{% endblock %}
 {% block content %}
 <div class="quiz-container">
-    <h2>{{ quiz.chapter.subject.name }} - {{ quiz.chapter.name }}</h2>
-    <p>Duration: {{ quiz.time_duration }}</p>
+    <div style="display: flex; justify-content: space-between;">
+        <h4 id="white">{{ quiz.chapter.course.s_name }} - {{ quiz.chapter.name }}- {{quiz.q_name}}</h4>
+        <h6 id="white">Duration: {{ quiz.time_duration }}</h6>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <h6 id="white">Chapter: {{ quiz.chapter.name }}</h6>
+        <h6 id="white">Deadline : {{ quiz.date_of_quiz }}</h6>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <h6 id="white">Subject:{{ quiz.chapter.course.s_name }}</h6>
+        <h6 id="white">No. of Questions: {{ quiz.questions|length }}</h6>
+    </div>
     
-    <form method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}" class="quiz-form">
+    <form method="POST" action="{{ url_for('start_Assessment', quiz_id=quiz.id) }}" class="quiz-form">
         {% for question in quiz.questions %}
         <div class="question-card">
-            <p class="question">{{ loop.index }}. {{ question.question_statement }}</p>
+            <p class="question">{{ loop.index }}. {{ question.statement }}</p>
             <div class="options">
                 <div class="option">
-                    <input type="radio" id="q{{ question.id }}_1" name="question_{{ question.id }}" value="1" required>
-                    <label for="q{{ question.id }}_1">{{ question.option1 }}</label>
+                    <input type="radio" name="{{ question.id }}" value="1" required>
+                    <label>{{ question.opt1 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="q{{ question.id }}_2" name="question_{{ question.id }}" value="2">
-                    <label for="q{{ question.id }}_2">{{ question.option2 }}</label>
+                    <input type="radio" name="{{ question.id }}" value="2">
+                    <label>{{ question.opt2 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="q{{ question.id }}_3" name="question_{{ question.id }}" value="3">
-                    <label for="q{{ question.id }}_3">{{ question.option3 }}</label>
+                    <input type="radio" name="{{ question.id }}" value="3">
+                    <label>{{ question.opt3 }}</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="q{{ question.id }}_4" name="question_{{ question.id }}" value="4">
-                    <label for="q{{ question.id }}_4">{{ question.option4 }}</label>
+                    <input type="radio" name="{{ question.id }}" value="4">
+                    <label>{{ question.opt4 }}</label>
                 </div>
             </div>
         </div>
@@ -34,3 +44,4 @@
     </form>
 </div>
 {% endblock %}
+

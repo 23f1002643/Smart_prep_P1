@@ -18,6 +18,7 @@ class Account(db.Model):
     dob = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(120), nullable=False)
     role = db.Column(db.String(100), default="user")
+    active = db.Column(db.Boolean, default=True)
     
     # Relationship with Score table
     scores = db.relationship('ExamPerformance', back_populates='user', cascade='all, delete-orphan')
@@ -48,11 +49,11 @@ class Assessment(db.Model):
     __tablename__ = 'Quiz_Table'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    q_name = db.Column(db.String(80), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('Chapters.id'), nullable=False)
     date_of_quiz = db.Column(db.Date, nullable=False)
-    time_duration = db.Column(db.String(25), nullable=False)  # Format: HH:MM
+    time_duration = db.Column(db.String(8), nullable=False)  # Format: HH:MM
     remarks = db.Column(db.Text)
-    
     # Relationships
     questions = db.relationship('AssessmentProblem', back_populates='quiz', cascade="all, delete-orphan")
     scores = db.relationship('ExamPerformance', back_populates='quiz', cascade="all, delete-orphan")
@@ -63,7 +64,7 @@ class AssessmentProblem(db.Model):
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     quiz_id = db.Column(db.Integer, db.ForeignKey('Quiz_Table.id'), nullable=False)
-    question_statement = db.Column(db.String(200), nullable=False)
+    statement = db.Column(db.String(200), nullable=False)
     opt1 = db.Column(db.String(150), nullable=False)
     opt2 = db.Column(db.String(150), nullable=False)
     opt3 = db.Column(db.String(150), nullable=False)

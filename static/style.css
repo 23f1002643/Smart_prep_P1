@@ -153,21 +153,21 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-.subject-card {
-  background-color: var(--card-bg);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .button-group {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
 }
-
+.subject-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
 .question-card {
   background-color: var(--card-bg);
   padding: 1.5rem;
@@ -212,15 +212,11 @@ body {
 .gradient-custom {
   /* fallback for old browsers */
   background: #6a11cb;
-
-  /* Chrome 10-25, Safari 5.1-6 */
   background: -webkit-linear-gradient(
     to right,
     rgba(106, 17, 203, 1),
     rgba(37, 117, 252, 1)
   );
-
-  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background: linear-gradient(
     to right,
     rgba(106, 17, 203, 1),
@@ -247,3 +243,8 @@ body {
   #white {
     color: rgb(235, 228, 228);
   }
+.button-group {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+

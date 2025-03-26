@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Update Question{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Update Question</h2>
+    <form method="POST" action="{{ url_for('update_quest', sub_id=sub_id, chap_id=chap_id, quiz_id=quiz_id, ques_id=question.id) }}" class="form">
+        <div class="form-group">
+            <label id="white" for="statement">Question Statement:</label>
+            <input type="text" id="statement" name="statement" value="{{ question.statement }}" required>
+        </div>
+        <div class="form-group">
+            <div style="display:flex; gap: 10px;">
+                <input type="text" name="options" value="{{ question.opt1 }}" placeholder="Option 1" required style="width: 550px;">
+                <input type="text" name="options" value="{{ question.opt2 }}" placeholder="Option 2" required style="width: 550px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <div style="display:flex; gap: 10px;">
+                <input type="text" name="options" value="{{ question.opt3 }}" placeholder="Option 3" required style="width: 550px;">
+                <input type="text" name="options" value="{{ question.opt4 }}" placeholder="Option 4" required style="width: 550px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label id="white" for="cor_opt">Correct Option:</label>
+            <input type="number" id="cor_opt" name="cor_opt" value="{{ question.cor_opt }}" min="1" max="4" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Question</button>
+    </form>
+</div>
+{% endblock %}

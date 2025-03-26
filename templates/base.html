@@ -21,9 +21,16 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 {% if session.get('user_id') %}
+                    <form class="form-inline my-2 my-lg-0" method="POST" action="{{ url_for('search') }}">
+                        <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
                     {% if session.get('role') == 'admin' %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_subjects') }}">Manage Subjects</a></li>
+                    {% endif %}
+                    {% if session.get('role') != 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="#">Scores</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
@@ -47,3 +54,4 @@
     </div>
 </body>
 </html>
+

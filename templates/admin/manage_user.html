@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+    <h4 id="white">Manage Users</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Username</th>
+                <th>Score</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            {% if user.role != 'admin' %}
+            <tr>
+                <td>{{ user.f_name }}</td>
+                <td>{{ user.l_name }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.scores|length }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ "Active" if user.active else "Deactive" }}</td>
+                <td>
+                    <form action="{{ url_for('manage_user', user_id=user.id) }}" method="POST">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit" class="btn btn-{{ 'success' if not user.active else 'danger' }} text-white">
+                            {{ "Activate" if not user.active else "Deactivate" }}
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

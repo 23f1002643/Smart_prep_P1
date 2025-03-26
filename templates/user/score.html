@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Your Score{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Your Score in {{ quiz.q_name }} - of Chapter - {{ quiz.chapter.name }}</h2>
+    <h4 id="white">You scored {{ Total_Marks }} out of {{ quiz.questions|length }}.</h4>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-danger">Go to Dashboard</a>
+</div>
+{% endblock %}

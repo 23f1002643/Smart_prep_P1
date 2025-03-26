@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<div class="content-section">
+    <h2 id="white">Search Results</h2>
+    {% if user_role == 'admin' %}
+        <h4 id="white">You searched for: {{ search_query }}</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.f_name }}</td>
+                    <td>{{ user.l_name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ "Active" if user.active else "Deactive" }}</td>
+                    <td>
+                        <form action="{{ url_for('manage_user', user_id=user.id) }}" method="POST">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" class="btn btn-{{ 'success' if not user.active else 'danger' }} text-white">
+                                {{ "Activate" if not user.active else "Deactivate" }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h4 id="white">You searched for: {{ search_query }}</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Chapter</th>
+                    <th>Quiz Name</th>
+                    <th>Duration</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizzes %}
+                <tr>
+                    <td>{{ quiz.chapter.subject.s_name }}</td>
+                    <td>{{ quiz.chapter.name }}</td>
+                    <td>{{ quiz.q_name }}</td>
+                    <td>{{ quiz.time_duration }}</td>
+                    <td>{{ quiz.date_of_quiz }}</td>
+                    <td>
+                        <a href="{{ url_for('start_Assessment', quiz_id=quiz.id) }}" class="btn btn-primary">Start</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
+

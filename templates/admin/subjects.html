@@ -17,9 +17,10 @@
     </form>
 
     <div class="subjects-list">
-        <h3 id="white">Current Subjects</h3>
+        <br><h4 id="white">Current Subjects</h4>
+
         {% for subject in subjects %}
-        <div class="subject-card">
+        <div class="subject-card d-flex justify-content-between align-items-center">
             <h4>{{ subject.s_name }}</h4>
             <p>{{ subject.remarks }}</p>
             <div class="button-group">
@@ -27,7 +28,7 @@
                 <form action="{{ url_for('delete_subject', sub_id=subject.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
-                <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage Chapters</a>
+                <a href="{{ url_for('add_chapter', sub_id=subject.id) }}" class="btn btn-primary">Manage</a>
             </div>
         </div>
         {% endfor %}
