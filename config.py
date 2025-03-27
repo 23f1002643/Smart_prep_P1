@@ -7,4 +7,5 @@ config_settings = {
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
     'SECRET_KEY': 'my_secret_key',
     'PERMANENT_SESSION_LIFETIME': timedelta(minutes=30)
+
 }

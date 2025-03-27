@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}User Summary{% endblock %}
+
+{% block content %}
+<div>
+    <h2 id="white">Summary of Your Scores</h2>
+    <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+        <!-- First Chart -->
+        <div style="flex: 1; margin: 10px;">
+            <h3 id="white">Score Summary per Quiz</h3>
+            <img src="{{ url_for('static', filename='quiz_performance.png') }}" alt="Quiz Performance Summary" style="width: 100%;">
+        </div>
+        <!-- Second Chart -->
+        <div style="flex: 1; margin: 10px;">
+            <h3 id="white">Total Attempts per Subject</h3>
+            <img src="{{ url_for('static', filename='subject_attempts.png') }}" alt="Total Attempts per Subject" style="width: 100%;">
+        </div>
+    </div>
+    <div style="margin-top: 20px;">
+        <!-- Third Chart -->
+        <h3 id="white">Quiz Attempts per Subject</h3>
+        <img src="{{ url_for('static', filename='attempt_distribution.png') }}" alt="Quiz Attempts per Subject" style="width: 50%;">
+    </div>
+</div>
+{% endblock %}
+

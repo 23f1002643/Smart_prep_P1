@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from models import db, Account, Courses, Assessment, CourseModule, AssessmentProblem, ExamPerformance 
 from datetime import datetime
+import seaborn as sns
+import os
 import config
 
 # Flask app setup
@@ -9,6 +11,7 @@ app.config['SECRET_KEY'] = config.config_settings['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = config.config_settings['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.config_settings['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['PERMANENT_SESSION_LIFETIME'] = config.config_settings['PERMANENT_SESSION_LIFETIME']
+
 db.init_app(app)
 
 def check_admin():
@@ -28,7 +31,7 @@ def check_admin():
             db.session.add(admin)
             db.session.commit()
             print("Admin account created.")
-        print('Bhai admin pehla hi creted hai')
+        print('Bhai Already created hai')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -429,10 +432,209 @@ def available_quiz(chap_id):
     quizzes = Assessment.query.filter_by(chapter_id=chap_id).all()
     return render_template('user/view_quiz.html', quizzes=quizzes, chapter=chapter)
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
+@app.route('/user/performance_summary')
+def performance_summary():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
+    user_id = session['user_id']
+    attempts = ExamPerformance.query.filter_by(user_id=user_id).all()
 
+    subject_scores = {}
+    for attempt in attempts:
+        quiz = Assessment.query.get(attempt.quiz_id)
+        if not quiz:
+            continue
+        chapter = CourseModule.query.get(quiz.chapter_id)
+        if not chapter:
+            continue
+        subject = Courses.query.get(chapter.subject_id)
+        if not subject:
+            continue
+        score_percentage = (attempt.score / len(quiz.questions)) * 100 if len(quiz.questions) > 0 else 0
+        if subject.s_name not in subject_scores:
+            subject_scores[subject.s_name] = {'highest': score_percentage}
+        else:
+            subject_scores[subject.s_name]['highest'] = max(subject_scores[subject.s_name]['highest'], score_percentage)
 
+    # Create the first chart (Vertical Bar Chart)
+    plt.figure(figsize=(8, 4))  # Reduced size for better layout
+    subjects = list(subject_scores.keys())
+    highest_scores = [data['highest'] for data in subject_scores.values()]
+    bars = plt.bar(subjects, highest_scores, alpha=0.8, label='Highest Score')
+    plt.title("Highest Score per Subject")
+    plt.xlabel("Subjects")
+    plt.ylabel("Highest Score Percentage")
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    # Add score values on top of bars 
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval, f'{yval:.1f}%', va='bottom')
+
+    plt.savefig('static/quiz_performance.png', bbox_inches='tight')
+    plt.close()
+
+    subject_attempts = {}
+    for attempt in attempts:
+        quiz = Assessment.query.get(attempt.quiz_id)
+        if not quiz:
+            continue
+        chapter = CourseModule.query.get(quiz.chapter_id)
+        if not chapter:
+            continue
+        subject = Courses.query.get(chapter.subject_id)
+        if not subject:
+            continue
+        if subject.s_name not in subject_attempts:
+            subject_attempts[subject.s_name] = 0
+        subject_attempts[subject.s_name] += 1
+
+    # Create the second chart (Total Quiz Attempts per Subject)
+    plt.figure(figsize=(8, 4))  # Reduced size for better layout
+    bars = plt.bar(subject_attempts.keys(), subject_attempts.values())
+    plt.title("Total Quiz Attempts per Subject")
+    plt.xlabel("Subjects")
+    plt.ylabel("Number of Attempts")
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    # Add values on top of bars
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval, f'{int(yval)}', va='bottom')
+
+    plt.savefig('static/subject_attempts.png', bbox_inches='tight')
+    plt.close()
+
+    # Create the third chart (Pie Chart with Number of Attempts)
+    plt.figure(figsize=(8, 8))
+    labels = [f"{subject} ({count} attempts)" for subject, count in subject_attempts.items()]
+    plt.pie(subject_attempts.values(), labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title("Distribution of Quiz Attempts per Subject")
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.savefig('static/attempt_distribution.png', bbox_inches='tight')
+    plt.close()
+
+    return render_template('user/user_summary.html',
+                           quiz_performance='quiz_performance.png',
+                           subject_attempts='subject_attempts.png',
+                           attempt_distribution='attempt_distribution.png')
+
+@app.route('/admin/statiscis')
+def statiscis():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+
+    subjects = Courses.query.all()
+    top_scorers, subject_attempts, average_scores = {}, {}, {}
+    user_average_scores = {}
+
+    for subject in subjects:
+        total_score, total_questions = 0, 0
+        chapters = CourseModule.query.filter_by(subject_id=subject.id).all()
+        for chapter in chapters:
+            quizzes = Assessment.query.filter_by(chapter_id=chapter.id).all()
+            for quiz in quizzes:
+                attempts = ExamPerformance.query.filter_by(quiz_id=quiz.id).all()
+                for attempt in attempts:
+                    subject_attempts[subject.s_name] = subject_attempts.get(subject.s_name, 0) + 1
+                    total_score += attempt.score
+                    total_questions += len(quiz.questions)
+                    if attempt.score > top_scorers.get(subject.s_name, {}).get('score', 0):
+                        top_scorers[subject.s_name] = {'user': attempt.user_id, 'score': attempt.score}
+        average_scores[subject.s_name] = (total_score / total_questions) * 100 if total_questions > 0 else 0
+
+    users = Account.query.all()
+    for user in users:
+        user_attempts = ExamPerformance.query.filter_by(user_id=user.id).all()
+        total_score = sum(attempt.score for attempt in user_attempts)
+        total_questions = sum(len(Assessment.query.get(attempt.quiz_id).questions) for attempt in user_attempts)
+        user_average_scores[user.username] = (total_score / total_questions) * 100 if total_questions > 0 else 0
+
+    def plot_bar_chart(data, title, xlabel, ylabel, filename):
+        plt.figure(figsize=(10, 6))
+        bars = plt.bar(data.keys(), data.values(), alpha=0.8)
+        plt.title(title, fontsize=14)
+        plt.xlabel(xlabel, fontsize=12)
+        plt.ylabel(ylabel, fontsize=12)
+        plt.xticks(rotation=45, ha='right', fontsize=10)
+        plt.yticks(fontsize=10)
+        plt.tight_layout()
+        for bar in bars:
+            plt.text(bar.get_x() + bar.get_width()/2, bar.get_height(), f'{bar.get_height():.1f}%', va='bottom', fontsize=10)
+        plt.savefig(f'static/{filename}', bbox_inches='tight')
+        plt.close()
+
+    plot_bar_chart({chapter.name: (sum(attempt.score for quiz in Assessment.query.filter_by(chapter_id=chapter.id).all() 
+                      for attempt in ExamPerformance.query.filter_by(quiz_id=quiz.id).all()) / 
+                      sum(len(quiz.questions) for quiz in Assessment.query.filter_by(chapter_id=chapter.id).all())) * 100 
+                      for chapter in CourseModule.query.all()}, 
+                   "Average Score per Chapter", "Chapters", "Average Score Percentage (%)", "chapter_average_score.png")
+
+    plot_bar_chart(average_scores, "Average Score per Subject", "Subjects", "Average Score Percentage (%)", "average_score_subject.png")
+    plot_bar_chart(user_average_scores, "Average Score per User", "Users", "Average Score Percentage (%)", "average_score_user.png")
+
+    plt.figure(figsize=(6, 6))
+    plt.pie(subject_attempts.values(), labels=[f"{subject} ({count} attempts)" for subject, count in subject_attempts.items()],
+            autopct='%1.1f%%', startangle=90)
+    plt.title("Total Attempts per Subject", fontsize=14)
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.savefig('static/subject_attempts_pie.png', bbox_inches='tight')
+    plt.close()
+
+    # Chart 1: Chapter-wise average score percentage
+    plt.figure(figsize=(12, 8))  # Increased height for better readability
+    chapters = CourseModule.query.all()
+    chapter_names = []
+    chapter_percentages = []
+
+    for chapter in chapters:
+        quizzes = Assessment.query.filter_by(chapter_id=chapter.id).all()
+        total_score = 0
+        total_possible_score = 0
+
+        for quiz in quizzes:
+            attempts = ExamPerformance.query.filter_by(quiz_id=quiz.id).all()
+            for attempt in attempts:
+                total_score += attempt.score
+                total_possible_score += len(quiz.questions)
+
+        if total_possible_score > 0:
+            percentage = min((total_score / total_possible_score) * 100, 100)  # Cap percentage at 100%
+            chapter_names.append(chapter.name)
+            chapter_percentages.append(percentage)
+
+    # Create the bar chart
+    bars = plt.bar(chapter_names, chapter_percentages, alpha=0.8)
+    plt.title("Average Score per Chapter", fontsize=16)
+    plt.xlabel("Chapters", fontsize=14)
+    plt.ylabel("Average Score Percentage (%)", fontsize=14)
+    plt.xticks(rotation=45, ha='right', fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.ylim(0, 100)  # Limit Y-axis to 100%
+    plt.tight_layout()
+
+    # Add percentage values on top of bars
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval, f'{yval:.1f}%', va='bottom', fontsize=12)
+
+    plt.savefig('static/chapter_average_score.png', bbox_inches='tight')
+    plt.close()
+
+    return render_template('admin/Statiscis.html',
+                           top_scorer_chart='chapter_average_score.png',
+                           average_score_subject='average_score_subject.png',
+                           average_score_user='average_score_user.png',
+                           subject_attempts_pie='subject_attempts_pie.png')
 
 if __name__ == '__main__':
     with app.app_context():

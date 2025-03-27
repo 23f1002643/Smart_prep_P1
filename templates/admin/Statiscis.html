@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block content %}
+<div>
+    <h2 id="white">Admin Statistics</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <!-- Chart 1 -->
+        <div style="flex: 1; min-width: 300px;">
+            <h3 id="white">Average Score per Chapter</h3>
+            <img src="{{ url_for('static', filename=top_scorer_chart) }}" alt="Top Scorer per Subject" style="width: 100%;">
+        </div>
+        <!-- Chart 2 -->
+        <div style="flex: 1; min-width: 300px;">
+            <h3 id="white">Average Score per Subject</h3>
+            <img src="{{ url_for('static', filename=average_score_subject) }}" alt="Average Score per Subject" style="width: 100%;">
+        </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+        <!-- Chart 3 -->
+        <div style="flex: 1; min-width: 300px;">
+            <h3 id="white">Average Score per User</h3>
+            <img src="{{ url_for('static', filename=average_score_user) }}" alt="Average Score per User" style="width: 100%;">
+        </div>
+        <!-- Chart 4 -->
+        <div style="flex: 1; min-width: 300px;">
+            <h3 id="white">Total Attempts per Subject</h3>
+            <img src="{{ url_for('static', filename=subject_attempts_pie) }}" alt="Total Attempts per Subject" style="width: 100%;">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
